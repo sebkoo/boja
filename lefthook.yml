@@ -12,3 +12,8 @@ commit-msg:
   commands:
     ai-attribution:
       run: bash scripts/no-ai-attribution.sh {1}
+
+pre-push:
+  commands:
+    verify:
+      run: pnpm typecheck && pnpm test
