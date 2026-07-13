@@ -1,0 +1,14 @@
+# Commit guards for boja. One-time install:
+#   pnpm add -D -w lefthook && pnpm lefthook install
+pre-commit:
+  parallel: true
+  commands:
+    forbidden-words:
+      run: bash scripts/forbidden-words.sh {staged_files}
+    ai-attribution:
+      run: bash scripts/no-ai-attribution.sh {staged_files}
+
+commit-msg:
+  commands:
+    ai-attribution:
+      run: bash scripts/no-ai-attribution.sh {1}
