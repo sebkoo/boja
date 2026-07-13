@@ -1,0 +1,7 @@
+# Boot smoke flow (ADR-0005). The Story 01 happy path gets its own flow later.
+# appId is a placeholder until the dev build / StoreKit story sets a real bundle
+# id; this flow is authored for the local simulator lane and is not run in CI yet.
+appId: app.boja.mobile
+---
+- launchApp
+- assertVisible: "Boja"
