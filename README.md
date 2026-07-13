@@ -38,11 +38,11 @@ flowchart LR
 
 | Layer | How this repo implements it |
 |---|---|
-| 1. Retrieval | pgvector embeddings of preferences + venue notes; RAG behind venue proposals |
-| 2. Efficiency | one AI gateway; semantic cache on normalized intents; small-model parse → large-model plan; per-request token/cost log |
-| 3. Action | typed tool-calling: `.ics` generation, venue lookup, share-card render; MCP-compatible definitions |
-| 4. Agent | one plan→act→observe loop, step budget, per-step checkpoint, session memory in Postgres; no free-running autonomy |
-| 5. Trust | nothing outbound without explicit confirm; PII redaction in logs; tracing; a golden-set eval that blocks merge on regression |
+| 1.&nbsp;Retrieval | pgvector embeddings of preferences + venue notes; RAG behind venue proposals |
+| 2.&nbsp;Efficiency | one AI gateway; semantic cache on normalized intents; small-model parse → large-model plan; per-request token/cost log |
+| 3.&nbsp;Action | typed tool-calling: `.ics` generation, venue lookup, share-card render; MCP-compatible definitions |
+| 4.&nbsp;Agent | one plan→act→observe loop, step budget, per-step checkpoint, session memory in Postgres; no free-running autonomy |
+| 5.&nbsp;Trust | nothing outbound without explicit confirm; PII redaction in logs; tracing; a golden-set eval that blocks merge on regression |
 
 Full write-up: [`docs/ai-architecture.md`](docs/ai-architecture.md).
 
@@ -74,21 +74,29 @@ pnpm build
   - [ADR-0004](docs/adr/0004-naming.md) — naming
   - [ADR-0005](docs/adr/0005-ui-testing.md) — UI testing
 
-### AI-assisted, human-owned
+### Human-owned, AI-assisted
 
 I build this repo with AI coding agents, but the process is enforced by the
 repo, not by good intentions:
 
-- **Context** — [`CLAUDE.md`](CLAUDE.md): the rules, the TDD and commit gates,
-  and a model/effort routing table (which model and reasoning depth per task).
-- **The loop** — [`.claude/commands/`](.claude/commands): `/story` (plan a
-  story, tests first) → `/green` (typecheck + tests pass) → `/ship` (stage
-  explicit paths, review the diff, commit) → `/adr` (record a decision).
-- **Guardrails on every commit** (via lefthook):
-  - `scripts/forbidden-words.sh` — a voice check derived from
-    [`docs/VOICE.md`](docs/VOICE.md); marketing vocabulary blocks the commit.
-  - `scripts/no-ai-attribution.sh` — keeps tool-authorship trailers out of history.
-  - pre-push runs `pnpm typecheck && pnpm test`; a red gate blocks the push.
+- **Prompt engineering** — the agent's instructions are versioned, not
+  improvised. [`CLAUDE.md`](CLAUDE.md)'s routing table pins the model and
+  reasoning effort to each task — planning at high effort in plan mode,
+  mechanical edits low — and the [`.claude/commands/`](.claude/commands) are
+  reusable, named prompts, not ad-hoc asks.
+- **Context engineering** — the durable context the agent works from lives in
+  the repo: [`CLAUDE.md`](CLAUDE.md) (the rules, the TDD and commit gates),
+  [`docs/VOICE.md`](docs/VOICE.md) (the source for every user-facing line), and
+  the ADRs (each decision, with its tradeoff). Same project, every session.
+- **Harness engineering** — a scaffold rejects bad output by machine, not by
+  trust: the test-first gate, two lefthook guards (`forbidden-words.sh` for
+  voice, `no-ai-attribution.sh` for provenance), `pnpm typecheck && pnpm test`
+  on pre-push, and the CI gates (lint → typecheck → test → coverage → build).
+  Break the voice, drop provenance, or fail a gate and the change never lands.
+- **Loop engineering** — one iteration is a fixed cycle: `/story` (plan, tests
+  first) → `/green` (typecheck + tests pass) → `/ship` (stage explicit paths,
+  review the diff, commit) → `/adr` (record a decision). Small steps, each
+  closed before the next.
 - **The invariant is human ownership**: I read every diff before it commits —
   the history is atomic, one concern each, with the reasoning in the body.
 
