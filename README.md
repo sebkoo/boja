@@ -44,7 +44,7 @@ flowchart LR
 | 4. Agent | one plan→act→observe loop, step budget, per-step checkpoint, session memory in Postgres; no free-running autonomy |
 | 5. Trust | nothing outbound without explicit confirm; PII redaction in logs; tracing; a golden-set eval that blocks merge on regression |
 
-Full write-up: `docs/ai-architecture.md` *(planned)*.
+Full write-up: [`docs/ai-architecture.md`](docs/ai-architecture.md).
 
 ## Quickstart
 
@@ -74,6 +74,28 @@ pnpm build
   - [ADR-0004](docs/adr/0004-naming.md) — naming
   - [ADR-0005](docs/adr/0005-ui-testing.md) — UI testing
 
+### AI-assisted, human-owned
+
+I build this repo with AI coding agents, but the process is enforced by the
+repo, not by good intentions:
+
+- **Context** — [`CLAUDE.md`](CLAUDE.md): the rules, the TDD and commit gates,
+  and a model/effort routing table (which model and reasoning depth per task).
+- **The loop** — [`.claude/commands/`](.claude/commands): `/story` (plan a
+  story, tests first) → `/green` (typecheck + tests pass) → `/ship` (stage
+  explicit paths, review the diff, commit) → `/adr` (record a decision).
+- **Guardrails on every commit** (via lefthook):
+  - `scripts/forbidden-words.sh` — a voice check derived from
+    [`docs/VOICE.md`](docs/VOICE.md); marketing vocabulary blocks the commit.
+  - `scripts/no-ai-attribution.sh` — keeps tool-authorship trailers out of history.
+  - pre-push runs `pnpm typecheck && pnpm test`; a red gate blocks the push.
+- **The invariant is human ownership**: I read every diff before it commits —
+  the history is atomic, one concern each, with the reasoning in the body.
+
+The claim isn't "an agent wrote code." It's that the guardrails, the atomic
+history, and per-diff review make AI-assisted work as verifiable as a test
+makes a behavior verifiable.
+
 ## User stories
 
 | # | Story | Status | Test | Media |
@@ -82,11 +104,11 @@ pnpm build
 
 ## Roadmap
 
-Small, honest steps: Story 01 end-to-end (core rules, test-first) → Fastify plan endpoint → Expo screen + Maestro flow → StoreKit 2 paywall (Swift) → pgvector retrieval → evals in CI. Tracked per phase in the ADRs and `docs/system-design.md` *(planned)*.
+Small, honest steps: Story 01 end-to-end (core rules, test-first) → Fastify plan endpoint → Expo screen + Maestro flow → StoreKit 2 paywall (Swift) → pgvector retrieval → evals in CI. Tracked per phase in the ADRs and [`docs/system-design.md`](docs/system-design.md).
 
 ## Monetization
 
-Free tier: one active plan. Pro subscription: unlimited plans, reminders, preference memory. iOS via StoreKit 2; a web companion via Stripe later. Pricing hypotheses and funnel events are recorded in `docs/monetization.md` *(planned)*. *(Pricing region and price point: to be decided.)*
+Free tier: one active plan. Pro subscription: unlimited plans, reminders, preference memory. iOS via StoreKit 2; a web companion via Stripe later. Pricing hypotheses and funnel events are recorded in [`docs/monetization.md`](docs/monetization.md); region and price point are pre-launch hypotheses there, to be validated.
 
 ## Contributing
 
