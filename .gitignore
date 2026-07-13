@@ -36,4 +36,5 @@ notes/
 # logs
 *.log
 
-.claude/
+.claude/*
+!.claude/commands/
