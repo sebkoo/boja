@@ -59,8 +59,8 @@ pnpm build
 
 ## Engineering
 
-<!-- CI and coverage badges ship with the GitHub Actions commit -->
-![CI pending](https://img.shields.io/badge/CI-pending-lightgrey)
+<!-- CI badge is live; the coverage badge stays pending until a reporter is wired -->
+[![CI](https://github.com/sebkoo/boja/actions/workflows/ci.yml/badge.svg)](https://github.com/sebkoo/boja/actions/workflows/ci.yml)
 ![coverage pending](https://img.shields.io/badge/coverage-pending-lightgrey)
 ![license MIT](https://img.shields.io/badge/license-MIT-blue)
 
