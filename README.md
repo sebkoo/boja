@@ -110,9 +110,31 @@ makes a behavior verifiable.
 |---|---|---|---|---|
 | 01 | paste intent → 3 options → confirm → plan card + `.ics` | planned | — | *ships with Story 01* |
 
-## Roadmap
+## Progress
 
-Small, honest steps: Story 01 end-to-end (core rules, test-first) → Fastify plan endpoint → Expo screen + Maestro flow → StoreKit 2 paywall (Swift) → pgvector retrieval → evals in CI. Tracked per phase in the ADRs and [`docs/system-design.md`](docs/system-design.md).
+**Now** — Story 01: paste intent → three options → confirm → plan card + `.ics`.
+**Done** — Phase 1 (scaffolding, docs, harness, CI); Story 01 domain rules in `packages/core` and AI seams in `packages/ai`.
+**Next** — the Fastify plan endpoints in `apps/api`, then the Expo screen and Maestro flow in `apps/mobile`; then the StoreKit 2 paywall, pgvector retrieval, and evals in CI.
+
+Story 01: core ✅✅✅ · ai ✅✅✅✅ · api ◻◻◻ · mobile ◻◻◻◻◻
+
+- **core** — `proposeOptions` · `toIcs` · `toPlanCard`
+- **ai** — `FixtureVenueRetriever` · `FixturePlanner` / `StepBudget` · outbound gate · `FixtureIntentParser`
+- **api** — `buildApp` wiring · `POST /plans/propose` · `POST /plans/confirm`
+- **mobile** — `PlannerPort` · `PlanScreen` · render test · Maestro flow · i18n copy
+
+A check lands only after its commits are on `main`. Tracked in the ADRs and [`docs/system-design.md`](docs/system-design.md).
+
+```mermaid
+flowchart LR
+  P1["Phase 1: scaffolding, CI"]:::done
+  S1["Story 01: core, ai, api, mobile"]:::current
+  S2["Story 02+"]:::planned
+  P1 --> S1 --> S2
+  classDef done fill:#1a7f37,stroke:#116329,color:#ffffff
+  classDef current fill:#0969da,stroke:#0a3069,color:#ffffff
+  classDef planned fill:#8b949e,stroke:#6e7681,color:#ffffff
+```
 
 ## Monetization
 
