@@ -71,3 +71,70 @@ describe("POST /plans/propose", () => {
     expect(res.statusCode).toBe(422);
   });
 });
+
+async function proposeFor(app: ReturnType<typeof buildApp>): Promise<unknown> {
+  const res = await app.inject({ method: "POST", url: "/plans/propose", payload: validIntent });
+  return res.json();
+}
+
+describe("POST /plans/confirm", () => {
+  it("returns 200 with a card and ics for a valid confirm", async () => {
+    const app = buildApp();
+    const proposal = await proposeFor(app);
+    const res = await app.inject({
+      method: "POST",
+      url: "/plans/confirm",
+      payload: { proposal, optionIndex: 0 },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.card.title).toEqual(expect.any(String));
+    expect(typeof body.ics).toBe("string");
+  });
+
+  it("returns an ics that spot-checks as a VCALENDAR with a DTSTART", async () => {
+    const app = buildApp();
+    const proposal = await proposeFor(app);
+    const res = await app.inject({
+      method: "POST",
+      url: "/plans/confirm",
+      payload: { proposal, optionIndex: 0 },
+    });
+    const body = res.json();
+    expect(body.ics).toContain("BEGIN:VCALENDAR");
+    expect(body.ics).toContain("DTSTART");
+  });
+
+  it("returns 400 for an out-of-range optionIndex", async () => {
+    const app = buildApp();
+    const proposal = await proposeFor(app);
+    const res = await app.inject({
+      method: "POST",
+      url: "/plans/confirm",
+      payload: { proposal, optionIndex: 3 },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("returns 400 for a malformed body", async () => {
+    const app = buildApp();
+    const res = await app.inject({
+      method: "POST",
+      url: "/plans/confirm",
+      payload: { optionIndex: 0 },
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("asserts no outbound -- the sink spy is never called across propose + confirm", async () => {
+    const calls: unknown[] = [];
+    const app = buildApp({ outbound: { send: async (action) => void calls.push(action) } });
+    const proposal = await proposeFor(app);
+    await app.inject({
+      method: "POST",
+      url: "/plans/confirm",
+      payload: { proposal, optionIndex: 0 },
+    });
+    expect(calls).toHaveLength(0);
+  });
+});
