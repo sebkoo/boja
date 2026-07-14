@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 
 import { FIXTURE_VENUES } from "./fixtures/venues.js";
+import { registerPlanRoutes } from "./routes/plans.js";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -46,6 +47,8 @@ export function buildApp(opts: BuildAppOpts = {}) {
     },
     async () => ({ status: "ok" as const }),
   );
+
+  registerPlanRoutes(app);
 
   return app;
 }
