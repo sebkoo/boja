@@ -13,6 +13,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "@boja/ai": "workspace:*",
     "@boja/core": "workspace:*",
     "fastify": "^5.10.0",
     "fastify-type-provider-zod": "^7.0.0",

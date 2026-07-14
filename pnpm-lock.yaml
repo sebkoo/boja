@@ -35,6 +35,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@boja/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@boja/core':
         specifier: workspace:*
         version: link:../../packages/core
