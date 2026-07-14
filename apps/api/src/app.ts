@@ -36,6 +36,13 @@ export function buildApp(opts: BuildAppOpts = {}) {
   app.decorate("venues", opts.venues ?? FIXTURE_VENUES);
   app.decorate("outboundSink", opts.outbound ?? noopOutboundSink);
 
+  app.setErrorHandler((err, _request, reply) => {
+    if (err instanceof RangeError) {
+      return reply.code(400).send({ message: err.message });
+    }
+    throw err;
+  });
+
   app.get(
     "/health",
     {

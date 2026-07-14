@@ -1,5 +1,14 @@
-import { FixturePlanner, FixtureVenueRetriever } from "@boja/ai";
-import { InsufficientCandidatesError, IntentSchema, ProposalSchema, type Prefs } from "@boja/core";
+import { FixturePlanner, FixtureVenueRetriever, guardOutbound } from "@boja/ai";
+import {
+  confirmPlan,
+  InsufficientCandidatesError,
+  IntentSchema,
+  PlanCardSchema,
+  ProposalSchema,
+  toIcs,
+  toPlanCard,
+  type Prefs,
+} from "@boja/core";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
@@ -38,6 +47,29 @@ export function registerPlanRoutes(app: FastifyInstance): void {
         }
         throw err;
       }
+    },
+  );
+
+  app.withTypeProvider<ZodTypeProvider>().post(
+    "/plans/confirm",
+    {
+      schema: {
+        body: z.object({ proposal: ProposalSchema, optionIndex: z.number().int().nonnegative() }),
+        response: {
+          200: z.object({ card: PlanCardSchema, ics: z.string() }),
+        },
+      },
+    },
+    async (request) => {
+      const { proposal, optionIndex } = request.body;
+
+      const verdict = guardOutbound({ kind: "ics", confirmed: true });
+      if (!verdict.ok) {
+        throw new Error(verdict.reason);
+      }
+
+      const plan = confirmPlan(proposal, optionIndex);
+      return { card: toPlanCard(plan), ics: toIcs(plan) };
     },
   );
 }
