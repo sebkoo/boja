@@ -114,9 +114,9 @@ makes a behavior verifiable.
 
 **Now** — Story 01: paste intent → three options → confirm → plan card + `.ics`.
 **Done** — Phase 1 (scaffolding, docs, harness, CI); Story 01 domain rules in `packages/core` and AI seams in `packages/ai`.
-**Next** — the remaining Fastify plan endpoints in `apps/api`, then the Expo screen and Maestro flow in `apps/mobile`; then the StoreKit 2 paywall, pgvector retrieval, and evals in CI.
+**Next** — the Expo screen and Maestro flow in `apps/mobile`; then the StoreKit 2 paywall, pgvector retrieval, and evals in CI.
 
-Story 01: core ✅✅✅ · ai ✅✅✅✅ · api ✅✅◻ · mobile ◻◻◻◻◻
+Story 01: core ✅✅✅ · ai ✅✅✅✅ · api ✅✅✅ · mobile ◻◻◻◻◻
 
 - **core** — `proposeOptions` · `toIcs` · `toPlanCard`
 - **ai** — `FixtureVenueRetriever` · `FixturePlanner` / `StepBudget` · outbound gate · `FixtureIntentParser`
